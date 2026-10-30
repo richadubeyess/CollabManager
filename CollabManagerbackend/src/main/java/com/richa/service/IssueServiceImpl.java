@@ -75,52 +75,111 @@ public class IssueServiceImpl implements IssueService {
         return issueRepository.save(issue);
     }
 
+//    @Override
+//    public Optional<Issue> updateIssue(Long issueId, IssueRequest updatedIssue, Long userId)
+//            throws IssueException, UserException, ProjectException {
+//        User user = getUserOrThrow(userId);
+//        Optional<Issue> existingIssue = issueRepository.findById(issueId);
+//
+//        if (existingIssue.isPresent()) {
+//
+//            Project project = projectService.getProjectById(updatedIssue.getProjectId());
+//            if (project == null) {
+//                throw new IssueException("Project not found with ID: " + updatedIssue.getProjectId());
+//            }
+//
+//            User assignee = userService.findUserById(updatedIssue.getUserId());
+//            if (assignee == null) {
+//                throw new UserException("Assignee not found with ID: " + updatedIssue.getUserId());
+//            }
+//
+//            Issue issueToUpdate = existingIssue.get();
+//
+//
+//            if (updatedIssue.getDescription() != null) {
+//                issueToUpdate.setDescription(updatedIssue.getDescription());
+//            }
+//
+//            if (updatedIssue.getDueDate() != null) {
+//                issueToUpdate.setDueDate(updatedIssue.getDueDate());
+//            }
+//
+//            if (updatedIssue.getPriority() != null) {
+//                issueToUpdate.setPriority(updatedIssue.getPriority());
+//            }
+//
+//            if (updatedIssue.getStatus() != null) {
+//                issueToUpdate.setStatus(updatedIssue.getStatus());
+//            }
+//
+//            if (updatedIssue.getTitle() != null) {
+//                issueToUpdate.setTitle(updatedIssue.getTitle());
+//            }
+//
+//
+//            return Optional.of(issueRepository.save(issueToUpdate));
+//        }
+//
+//        throw new IssueException("Issue not found with issueid" + issueId);
+//    }
+
     @Override
-    public Optional<Issue> updateIssue(Long issueId, IssueRequest updatedIssue, Long userId)
-            throws IssueException, UserException, ProjectException {
-        User user = getUserOrThrow(userId);
+    public Optional<Issue> updateIssue(
+            Long issueId,
+            IssueRequest updatedIssue,
+            Long userId
+    ) throws IssueException, UserException, ProjectException {
+
+        getUserOrThrow(userId);
+
         Optional<Issue> existingIssue = issueRepository.findById(issueId);
 
-        if (existingIssue.isPresent()) {
-
-            Project project = projectService.getProjectById(updatedIssue.getProjectId());
-            if (project == null) {
-                throw new IssueException("Project not found with ID: " + updatedIssue.getProjectId());
-            }
-
-            User assignee = userService.findUserById(updatedIssue.getUserId());
-            if (assignee == null) {
-                throw new UserException("Assignee not found with ID: " + updatedIssue.getUserId());
-            }
-
-            Issue issueToUpdate = existingIssue.get();
-
-
-            if (updatedIssue.getDescription() != null) {
-                issueToUpdate.setDescription(updatedIssue.getDescription());
-            }
-
-            if (updatedIssue.getDueDate() != null) {
-                issueToUpdate.setDueDate(updatedIssue.getDueDate());
-            }
-
-            if (updatedIssue.getPriority() != null) {
-                issueToUpdate.setPriority(updatedIssue.getPriority());
-            }
-
-            if (updatedIssue.getStatus() != null) {
-                issueToUpdate.setStatus(updatedIssue.getStatus());
-            }
-
-            if (updatedIssue.getTitle() != null) {
-                issueToUpdate.setTitle(updatedIssue.getTitle());
-            }
-
-
-            return Optional.of(issueRepository.save(issueToUpdate));
+        if (existingIssue.isEmpty()) {
+            throw new IssueException("Issue not found with issueId " + issueId);
         }
 
-        throw new IssueException("Issue not found with issueid" + issueId);
+        Issue issueToUpdate = existingIssue.get();
+
+        if (updatedIssue.getProjectId() != null) {
+            Project project =
+                    projectService.getProjectById(updatedIssue.getProjectId());
+
+            if (project == null) {
+                throw new IssueException(
+                        "Project not found with ID: " + updatedIssue.getProjectId()
+                );
+            }
+
+            issueToUpdate.setProject(project);
+            issueToUpdate.setProjectID(updatedIssue.getProjectId());
+        }
+
+        if (updatedIssue.getUserId() != null) {
+            User assignee = userService.findUserById(updatedIssue.getUserId());
+            issueToUpdate.setAssignee(assignee);
+        }
+
+        if (updatedIssue.getDescription() != null) {
+            issueToUpdate.setDescription(updatedIssue.getDescription());
+        }
+
+        if (updatedIssue.getDueDate() != null) {
+            issueToUpdate.setDueDate(updatedIssue.getDueDate());
+        }
+
+        if (updatedIssue.getPriority() != null) {
+            issueToUpdate.setPriority(updatedIssue.getPriority());
+        }
+
+        if (updatedIssue.getStatus() != null) {
+            issueToUpdate.setStatus(updatedIssue.getStatus());
+        }
+
+        if (updatedIssue.getTitle() != null) {
+            issueToUpdate.setTitle(updatedIssue.getTitle());
+        }
+
+        return Optional.of(issueRepository.save(issueToUpdate));
     }
 
     @Override

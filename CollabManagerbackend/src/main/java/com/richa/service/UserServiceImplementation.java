@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.richa.exception.ProjectException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -85,24 +86,54 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
     }
 
+//    @Override
+//    public void sendPasswordResetEmail(User user) {
+//
+//
+//        String resetToken = generateRandomToken();
+//
+//        Date expiryDate = calculateExpiryDate();
+//
+//
+//        PasswordResetToken passwordResetToken = new PasswordResetToken(resetToken, user, expiryDate);
+//        passwordResetTokenRepository.save(passwordResetToken);
+//
+//
+//        sendEmail(user.getEmail(), "Password Reset",
+//                "Click the following link to reset your password: http://localhost:5454/reset-password?token="
+//                        + resetToken);
+//    }
+
     @Override
+    @Transactional
     public void sendPasswordResetEmail(User user) {
 
+        // Find the existing token for this user
+        Optional<PasswordResetToken> existingToken =
+                passwordResetTokenRepository.findByUser(user);
 
+        // Delete the old token
+        if (existingToken.isPresent()) {
+            passwordResetTokenRepository.delete(existingToken.get());
+            passwordResetTokenRepository.flush();
+        }
+
+        // Generate a new token
         String resetToken = generateRandomToken();
-
         Date expiryDate = calculateExpiryDate();
 
+        PasswordResetToken passwordResetToken =
+                new PasswordResetToken(resetToken, user, expiryDate);
 
-        PasswordResetToken passwordResetToken = new PasswordResetToken(resetToken, user, expiryDate);
         passwordResetTokenRepository.save(passwordResetToken);
 
-
-        sendEmail(user.getEmail(), "Password Reset",
-                "Click the following link to reset your password: http://localhost:5454/reset-password?token="
-                        + resetToken);
+        sendEmail(
+                user.getEmail(),
+                "Password Reset",
+                "Click the following link to reset your password: "
+                        + "http://localhost:5173/reset-password?token=" + resetToken
+        );
     }
-
     private void sendEmail(String to, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
