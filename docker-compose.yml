@@ -1,0 +1,45 @@
+﻿services:
+  mysql:
+    image: mysql:8.0
+    container_name: collabmanager-mysql
+    env_file:
+      - ./CollabManagerbackend/.env
+    environment:
+      MYSQL_DATABASE: collab
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./CollabManagerbackend
+      dockerfile: Dockerfile
+    container_name: collabmanager-backend
+    ports:
+      - "5054:5054"
+    env_file:
+      - ./CollabManagerbackend/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./CollabManagerfrontend/frontend
+      dockerfile: Dockerfile
+    container_name: collabmanager-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
