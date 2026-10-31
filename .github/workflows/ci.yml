@@ -19,6 +19,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: collab_test
+
+          
         ports:
           - 3306:3306
         options: >-
@@ -47,6 +49,8 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/collab_test
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: root
+          RAZORPAY_API_KEY: test_key
+          RAZORPAY_API_SECRET: test_secret
         run: |
           chmod +x mvnw
           ./mvnw clean verify
