@@ -79,3 +79,28 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+  docker-backend-build:
+    name: Docker Backend Build
+    runs-on: ubuntu-latest
+    needs: backend-build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t collabmanager-backend:test ./CollabManagerbackend
+
+
+  docker-frontend-build:
+    name: Docker Frontend Build
+    runs-on: ubuntu-latest
+    needs: frontend-build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build frontend Docker image
+        run: docker build -t collabmanager-frontend:test ./CollabManagerfrontend/frontend
