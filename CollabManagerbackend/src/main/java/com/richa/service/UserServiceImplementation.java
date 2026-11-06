@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.richa.exception.ProjectException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,9 @@ public class UserServiceImplementation implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
 
     @Override
@@ -130,8 +134,8 @@ public class UserServiceImplementation implements UserService {
         sendEmail(
                 user.getEmail(),
                 "Password Reset",
-                "Click the following link to reset your password: "
-                        + "http://localhost:5173/reset-password?token=" + resetToken
+                "Click the following link to reset your password: "+
+                frontendUrl + "/reset-password?token=" + resetToken
         );
     }
     private void sendEmail(String to, String subject, String message) {

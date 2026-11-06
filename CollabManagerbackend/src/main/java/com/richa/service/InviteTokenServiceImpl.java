@@ -3,6 +3,7 @@ package com.richa.service;
 import com.richa.exception.MailsException;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.richa.model.Invitation;
@@ -14,9 +15,11 @@ import java.util.UUID;
 public class InviteTokenServiceImpl implements InvitationService {
     @Autowired
     private InviteTokenRepository invitationRepository;
-
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
     @Autowired
     private EmailService emailService;
+
 
 
     public void sendInvitation(String email, Long projectId) throws MailsException, MessagingException {
@@ -31,7 +34,8 @@ public class InviteTokenServiceImpl implements InvitationService {
         invitationRepository.save(invitation);
 
 
-        String invitationLink = "http://localhost:5173/accept_invitation?token=" + invitationToken;
+        String invitationLink = frontendUrl
+                + "/accept_invitation?token=" + invitationToken;
         emailService.sendEmailWithToken(email, invitationLink);
 
     }
