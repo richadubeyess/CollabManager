@@ -44,7 +44,8 @@ public class ProjectServiceImpl implements ProjectService {
         createdProject.getTeam().add(user);
 
         System.out.println(createdProject);
-        Project savedProject=projectRepository.save(project);
+//        Project savedProject=projectRepository.save(project);
+        Project savedProject = projectRepository.save(createdProject);
 
         savedProject.getTeam().add(user);
 

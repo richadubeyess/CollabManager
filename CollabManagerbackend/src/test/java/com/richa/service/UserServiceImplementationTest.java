@@ -4,6 +4,7 @@ package com.richa.service;
 import com.richa.exception.UserException;
 import com.richa.model.PasswordResetToken;
 import com.richa.model.User;
+import org.springframework.test.util.ReflectionTestUtils;
 import com.richa.repository.PasswordResetTokenRepository;
 import com.richa.repository.UserRepository;
 
@@ -49,10 +50,17 @@ class UserServiceImplementationTest {
 
     @BeforeEach
     void setUp() {
+
         user = new User();
         user.setEmail("test@example.com");
         user.setPassword("oldPassword");
         user.setProjectSize(2);
+
+        ReflectionTestUtils.setField(
+                userService,
+                "frontendUrl",
+                "http://localhost:5173"
+        );
     }
 
     // 1. Find user by email - success
@@ -190,5 +198,87 @@ class UserServiceImplementationTest {
 
         verify(passwordResetTokenRepository)
                 .save(any(PasswordResetToken.class));
+    }
+    @Test
+    void sendPasswordResetEmail_whenOldTokenExists_deletesOldTokenAndCreatesNewOne() {
+
+        // Arrange
+        PasswordResetToken oldToken =
+                new PasswordResetToken("old-token", user, new Date());
+
+        when(passwordResetTokenRepository.findByUser(user))
+                .thenReturn(Optional.of(oldToken));
+
+        // Act
+        userService.sendPasswordResetEmail(user);
+
+        // Assert
+        verify(passwordResetTokenRepository).delete(oldToken);
+        verify(passwordResetTokenRepository).flush();
+
+        // Verify that a new token is saved
+        verify(passwordResetTokenRepository)
+                .save(any(PasswordResetToken.class));
+
+        // Verify that reset email is sent
+        verify(javaMailSender).send(any(SimpleMailMessage.class));
+    }
+    @Test
+    void sendPasswordResetEmail_containsCorrectFrontendUrl() {
+
+        // Act
+        userService.sendPasswordResetEmail(user);
+
+        // Capture the email
+        ArgumentCaptor<SimpleMailMessage> mailCaptor =
+                ArgumentCaptor.forClass(SimpleMailMessage.class);
+
+        verify(javaMailSender).send(mailCaptor.capture());
+
+        // Assert
+        SimpleMailMessage email = mailCaptor.getValue();
+        System.out.println("EMAIL CONTENT: " + email.getText());
+        assertTrue(email.getText().contains(
+                "http://localhost:5173/reset-password?token="
+        ));
+    }
+    @Test
+    void sendPasswordResetEmail_setsTokenExpiryToTenMinutes() {
+
+        // Arrange
+        Date beforeExecution = new Date();
+
+        // Act
+        userService.sendPasswordResetEmail(user);
+
+        Date afterExecution = new Date();
+
+        // Capture the saved token
+        ArgumentCaptor<PasswordResetToken> tokenCaptor =
+                ArgumentCaptor.forClass(PasswordResetToken.class);
+
+        verify(passwordResetTokenRepository)
+                .save(tokenCaptor.capture());
+
+        PasswordResetToken savedToken = tokenCaptor.getValue();
+
+        // Assert
+        Date expiryDate = savedToken.getExpiryDate();
+
+        long earliestExpectedExpiry =
+                beforeExecution.getTime() + 10 * 60 * 1000;
+
+        long latestExpectedExpiry =
+                afterExecution.getTime() + 10 * 60 * 1000;
+
+        assertTrue(
+                expiryDate.getTime() >= earliestExpectedExpiry,
+                "Token expiry should be at least 10 minutes after creation"
+        );
+
+        assertTrue(
+                expiryDate.getTime() <= latestExpectedExpiry,
+                "Token expiry should be no more than 10 minutes after creation"
+        );
     }
 }
