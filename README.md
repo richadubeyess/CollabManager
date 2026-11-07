@@ -10,7 +10,7 @@ pipeline uses **GitHub Actions**, **GitHub Container Registry (GHCR)**
 and **AWS Systems Manager (SSM) Run Command**, with AWS authentication
 through GitHub Actions OIDC.
 
-> **Live application:** http://13.238.142.161\
+> [Live Demo](http://13.238.142.161)
 > This is the EC2 instance's current public IP. It can change if the
 > instance is stopped and started without an Elastic IP. Update this URL
 > if the address changes.
