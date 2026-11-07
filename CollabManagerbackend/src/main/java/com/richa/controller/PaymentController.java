@@ -37,6 +37,8 @@ public class PaymentController {
 
     @Autowired
     private UserService userService;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
 
     @PostMapping("/payments/{planType}")
@@ -77,7 +79,9 @@ public class PaymentController {
             paymentLinkRequest.put("reminder_enable", true);
 
 
-            paymentLinkRequest.put("callback_url", "http://localhost:5173/upgrade_plan/success?planType=" + planType);
+            paymentLinkRequest.put("callback_url",
+                    frontendUrl + "/upgrade_plan/success?planType=" + planType);
+
             paymentLinkRequest.put("callback_method", "get");
 
 
