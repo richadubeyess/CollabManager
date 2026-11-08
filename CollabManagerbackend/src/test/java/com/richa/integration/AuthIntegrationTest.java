@@ -4,6 +4,8 @@ package com.richa.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.richa.model.User;
 import com.richa.model.Subscription;
+import com.richa.repository.ChatRepository;
+import com.richa.repository.ProjectRepository;
 import com.richa.repository.UserRepository;
 import com.richa.repository.SubscriptionRepository;
 import com.richa.request.LoginRequest;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:collabtest;MODE=MySQL;DB_CLOSE_DELAY=-1",
         "spring.datasource.driver-class-name=org.h2.Driver",
@@ -41,6 +44,11 @@ class AuthIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ChatRepository chatRepository;
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -50,10 +58,19 @@ class AuthIntegrationTest {
     private SubscriptionRepository subscriptionRepository;
 
     @BeforeEach
-    void setUp() {
-        subscriptionRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
+
+        void setUp() {
+
+            // Delete dependent records first
+            chatRepository.deleteAll();
+            projectRepository.deleteAll();
+
+            // Delete subscriptions before users
+            subscriptionRepository.deleteAll();
+            userRepository.deleteAll();
+        }
+
 
     @Test
     void signup_withValidDetails_createsUserAndSubscription()
