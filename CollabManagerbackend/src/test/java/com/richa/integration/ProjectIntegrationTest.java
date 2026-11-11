@@ -292,4 +292,5 @@ class ProjectIntegrationTest {
 
         assertEquals(0, updatedUser.getProjectSize());
     }
+
 }
