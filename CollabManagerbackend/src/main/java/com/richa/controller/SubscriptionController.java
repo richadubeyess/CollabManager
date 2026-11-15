@@ -6,6 +6,9 @@ import com.richa.exception.ProjectException;
 import com.richa.exception.UserException;
 import com.richa.model.User;
 import com.richa.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/subscriptions")
+@Tag(name = "Subscriptions", description = "Subscription management APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class SubscriptionController {
 
     @Autowired
@@ -31,7 +36,7 @@ public class SubscriptionController {
 
     @GetMapping("/user")
     public ResponseEntity<Subscription> getUserSubscription(
-            @RequestHeader("Authorization") String jwt) throws Exception {
+            @RequestHeader("Authorization") @Parameter(hidden = true) String jwt) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
         Subscription userSubscription = subscriptionService.getUserSubscription(user.getId());
 
@@ -43,7 +48,7 @@ public class SubscriptionController {
     }
 
     @PatchMapping("/upgrade")
-    public ResponseEntity<Subscription> upgradeSubscription(@RequestHeader("Authorization") String jwt,
+    public ResponseEntity<Subscription> upgradeSubscription(@RequestHeader("Authorization") @Parameter(hidden = true) String jwt,
                                                             @RequestParam PlanType planType) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         Subscription upgradedSubscription = subscriptionService.upgradeSubscription(user.getId(), planType);

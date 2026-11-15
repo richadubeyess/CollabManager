@@ -6,6 +6,9 @@ import com.richa.exception.MailsException;
 import com.richa.model.Invitation;
 import com.richa.request.ProjectInvitationRequest;
 import com.richa.service.InvitationService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,9 @@ import com.richa.service.UserService;
 
 @RestController
 @RequestMapping("/api/projects")
+@Tag(name = "Projects", description = "Project management APIs")
+@SecurityRequirement(name = "bearerAuth")
+
 public class ProjectController {
 
     @Autowired
@@ -46,10 +52,11 @@ public class ProjectController {
 
 
     @GetMapping
+
     public ResponseEntity<List<Project>> getProjects(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String tag,
-            @RequestHeader("Authorization") String token) throws ProjectException, UserException {
+            @RequestHeader("Authorization") @Parameter(hidden = true) String token) throws ProjectException, UserException {
         User user = userService.findUserProfileByJwt(token);
         List<Project> projects = projectService.getProjectsByTeam(user,category,tag);
         return new ResponseEntity<>(projects, HttpStatus.OK);
@@ -66,7 +73,7 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<Project> createProject(
             @RequestBody Project project,
-            @RequestHeader("Authorization") String token) throws UserException, ProjectException {
+            @RequestHeader("Authorization") @Parameter(hidden = true) String token) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         project.setOwner(user);
         Project createdProject = projectService.createProject(project, user.getId());
@@ -75,7 +82,8 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<Project> updateProject( @RequestBody Project updatedProject,@PathVariable Long projectId, @RequestHeader("Authorization") String token) throws UserException, ProjectException {
+
+    public ResponseEntity<Project> updateProject( @RequestBody Project updatedProject,@PathVariable Long projectId, @RequestHeader("Authorization")  @Parameter(hidden = true) String token) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         Project updated = projectService.updateProject(updatedProject,projectId);
         return updated != null ?
@@ -84,7 +92,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<MessageResponse> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) throws UserException, ProjectException {
+    public ResponseEntity<MessageResponse> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") @Parameter(hidden = true)String token) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
 
         MessageResponse response =new MessageResponse(projectService.deleteProject(projectId, user.getId()));
@@ -99,7 +107,7 @@ public class ProjectController {
     @GetMapping("/search")
     public ResponseEntity< List<Project>> searchProjects(
             @RequestParam(required = false) String keyword,
-            @RequestHeader("Authorization") String jwt
+            @RequestHeader("Authorization") @Parameter(hidden = true) String jwt
     ) throws ProjectException, UserException {
         User user=userService.findUserProfileByJwt(jwt);
         List<Project> projects = projectService.searchProjects(keyword,user);
@@ -138,7 +146,7 @@ public class ProjectController {
 
     @GetMapping("/accept_invitation")
     public ResponseEntity<Invitation> acceptInvitation(@RequestParam String token,
-                                                       @RequestHeader("Authorization") String jwt) throws Exception {
+                                                       @RequestHeader("Authorization") @Parameter(hidden = true)String jwt) throws Exception {
 
         User user=userService.findUserProfileByJwt(jwt);
 

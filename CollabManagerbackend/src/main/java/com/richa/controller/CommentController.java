@@ -11,6 +11,9 @@ import com.richa.request.CreateCommentRequest;
 import com.richa.response.MessageResponse;
 import com.richa.service.CommentService;
 import com.richa.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
+@Tag(name = "Comments", description = "Comment management APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class CommentController {
 
     private CommentService commentService;
@@ -35,7 +40,7 @@ public class CommentController {
     public ResponseEntity<Comment> createComment(
 
             @RequestBody CreateCommentRequest req,
-            @RequestHeader("Authorization") String jwt) throws UserException, IssueException, ProjectException {
+            @RequestHeader("Authorization") @Parameter(hidden = true) String jwt) throws UserException, IssueException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         Comment createdComment = commentService.createComment(req.getIssueId(), user.getId(), req.getContent());
         return new ResponseEntity<>(createdComment,HttpStatus.CREATED);
@@ -44,7 +49,7 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public ResponseEntity<MessageResponse> deleteComment(@PathVariable Long commentId,
 
-                                                         @RequestHeader("Authorization") String jwt) throws UserException, IssueException, ProjectException {
+                                                         @RequestHeader("Authorization")@Parameter(hidden = true) String jwt) throws UserException, IssueException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         commentService.deleteComment(commentId, user.getId());
         MessageResponse res=new MessageResponse();

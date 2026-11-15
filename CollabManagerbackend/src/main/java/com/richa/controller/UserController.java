@@ -1,6 +1,9 @@
 package com.richa.controller;
 
 import com.richa.exception.ProjectException;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,8 @@ import com.richa.model.User;
 import com.richa.service.UserService;
 
 @RestController
+@Tag(name = "Users", description = "User profile and management APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
 
@@ -24,7 +29,7 @@ public class UserController {
 
     @GetMapping("/api/users/profile")
     public ResponseEntity<User> getUserProfileHandler(
-            @RequestHeader("Authorization") String jwt) throws UserException, ProjectException {
+            @RequestHeader("Authorization")@Parameter(hidden = true) String jwt) throws UserException, ProjectException {
 
         User user = userService.findUserProfileByJwt(jwt);
         user.setPassword(null);
@@ -35,7 +40,7 @@ public class UserController {
     @GetMapping("/api/users/{userId}")
     public ResponseEntity<User> findUserById(
             @PathVariable Long userId,
-            @RequestHeader("Authorization") String jwt) throws UserException {
+            @RequestHeader("Authorization") @Parameter(hidden = true) String jwt) throws UserException {
 
         User user = userService.findUserById(userId);
         user.setPassword(null);
