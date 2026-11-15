@@ -802,6 +802,243 @@ normal account password. Ensure `FRONTEND_URL` points to the correct
 frontend origin so invitation and password-reset links open the correct
 application.
 
+# API Documentation & Testing
+
+##  API Documentation – Swagger / OpenAPI
+
+CollabManager uses **Swagger UI with OpenAPI 3.0** to provide interactive documentation for its REST APIs.
+
+The integration enables developers to explore available endpoints, understand API operations, review request and response structures, and execute API requests directly through the browser.
+
+### Key Features
+
+- Interactive documentation of REST API endpoints.
+- Organized API documentation using controller-level tags.
+- Support for HTTP methods, request parameters, and request bodies.
+- JWT Bearer authentication for secured endpoints.
+- Direct API execution and response inspection through Swagger UI.
+- OpenAPI specification generated from the Spring Boot application.
+
+### Technology Stack
+
+- Spring Boot
+- Springdoc OpenAPI
+- Swagger UI
+- OpenAPI 3.0
+- JWT Authentication
+
+### Authentication and Authorization
+
+JWT Bearer authentication is integrated into Swagger UI to support testing of secured endpoints.
+
+The Swagger authorization mechanism allows users to provide their JWT access token and execute protected API operations without manually configuring authorization headers for every request.
+
+Public authentication and password-reset endpoints remain accessible without JWT authentication, while protected endpoints require valid authentication.
+
+### API Organization
+
+The API documentation is organized into logical groups to improve readability and navigation.
+
+| API Module | Description |
+|---|---|
+| Authentication | User registration and authentication operations |
+| Projects | Project creation and management |
+| Users | User profile and management operations |
+| Comments | Comment management operations |
+| Payments | Subscription payment operations |
+| Messages | Chat and messaging operations |
+| Other Modules | Additional application functionality |
+
+### Production Deployment
+
+Swagger documentation is deployed alongside the application on AWS EC2.
+
+**Production Documentation Links**
+
+- **Swagger UI:** http://13.238.142.161/swagger-ui/index.html
+- **OpenAPI Specification:** http://13.238.142.161/v3/api-docs
+
+The frontend Nginx server is configured to route Swagger UI and OpenAPI requests to the Spring Boot backend, allowing API documentation to be accessed through the application's public address.
+
+### API Testing Through Swagger UI
+
+Swagger UI provides an interactive environment for testing APIs.
+
+Developers can:
+- Select an API endpoint.
+- Provide required parameters and request payloads.
+- Authorize requests using a JWT access token.
+- Execute API operations.
+- Inspect HTTP status codes and response bodies.
+
+**Note:** Swagger documents REST APIs. WebSocket/STOMP messaging operations are tested separately using dedicated API testing tools.
+
+---
+
+## Backend Testing Strategy
+
+A structured testing approach has been implemented to improve application reliability, validate business logic, and verify interactions between different application components.
+
+The backend testing strategy includes:
+
+- Unit Testing
+- Integration Testing
+- Code Coverage Analysis
+
+### Testing Technologies
+
+| Technology | Purpose |
+|---|---|
+| JUnit 5 | Automated test case execution |
+| Mockito | Mocking dependencies and isolating components |
+| Spring Boot Test | Testing Spring Boot application components |
+| MockMvc | Testing REST controller endpoints |
+| H2 Database | In-memory database for testing |
+| JaCoCo | Code coverage analysis |
+| Maven Surefire | Unit test execution |
+
+---
+
+## Unit Testing
+
+Unit testing is used to validate individual application components independently, ensuring that business logic behaves as expected.
+
+JUnit 5 and Mockito are used to develop and execute unit tests across the backend application.
+
+### Testing Scope
+
+- Service-layer business logic.
+- Successful execution scenarios.
+- Exception handling and failure scenarios.
+- Repository interaction verification.
+- Input and output validation.
+- Independent testing of application components using mocked dependencies.
+
+### Testing Approach
+
+Mockito is used to isolate the component under test by mocking its dependencies. JUnit 5 is used to execute test cases and verify expected application behavior through assertions and interaction verification.
+
+This approach helps identify defects at the component level without requiring the complete application environment.
+
+---
+
+## Integration Testing
+
+Integration testing validates the interaction between multiple application components to ensure that they function correctly together.
+
+Unlike unit testing, integration testing focuses on verifying application workflows and interactions across different layers.
+
+### Testing Scope
+
+- Controller and service layer interactions.
+- Service and repository layer interactions.
+- REST API request and response handling.
+- Database operations.
+- Application-level validation.
+- Successful and unsuccessful execution scenarios.
+
+### Testing Approach
+
+Spring Boot Test is used to initialize the application testing environment, while MockMvc is used to simulate HTTP requests and validate controller responses.
+
+An H2 in-memory database is configured for testing to provide an isolated database environment.
+
+This ensures that automated tests can execute without depending on the production MySQL database or modifying production application data.
+
+### Modules Covered
+
+Integration testing has been performed across the following application modules:
+
+| Module | Testing Focus |
+|---|---|
+| Authentication | Authentication-related application flows |
+| User | User management operations |
+| Project | Project management operations |
+| Issue | Issue management operations |
+| Comment | Comment management operations |
+| Message | Messaging functionality |
+| Password Reset | Password reset operations |
+| Payment | Payment-related functionality |
+| Subscription | Subscription management operations |
+
+---
+
+## Code Coverage Analysis – JaCoCo
+
+JaCoCo is integrated into the backend project to measure automated test coverage and provide insights into the extent to which application code is exercised by the test suite.
+
+### Coverage Metrics
+
+The JaCoCo report provides visibility into:
+
+- Instruction Coverage
+- Branch Coverage
+- Line Coverage
+- Method Coverage
+- Class Coverage
+
+### Coverage Report
+
+The coverage report is generated as part of the Maven verification process.
+
+The generated HTML report provides a detailed view of coverage at the package, class, and method levels.
+
+This helps identify untested code paths and areas where additional test cases may be beneficial.
+
+---
+
+## Test Execution and Build Verification
+
+Maven is used to manage the backend build and automated test execution lifecycle.
+
+The project supports local test execution and complete build verification through Maven.
+
+The verification process includes:
+
+- Cleaning previously generated build artifacts.
+- Compiling application source files.
+- Compiling test source files.
+- Executing configured automated tests.
+- Running the configured verification lifecycle.
+- Generating the JaCoCo coverage report.
+
+The test suite can be executed locally from the backend project directory.
+
+---
+
+## Testing Results
+
+The backend testing suite has been executed successfully.
+
+| Testing Category | Status |
+|---|---|
+| Unit Testing | Passed |
+| Integration Testing | Passed |
+| H2 Test Database Configuration | Completed |
+| JaCoCo Integration | Completed |
+| Maven Build Verification | Successful |
+
+**Automated Testing:** Approximately 166 unit tests passed during the recorded test execution.
+
+Integration tests were also executed successfully across the major application modules listed above.
+
+---
+
+## Benefits
+
+The implementation of Swagger documentation and automated testing provides several benefits:
+
+- **Improved API Discoverability:** Interactive API documentation makes endpoints easier to explore and understand.
+- **Simplified API Testing:** Developers can execute and inspect API requests directly through Swagger UI.
+- **JWT Authentication Testing:** Secured endpoints can be tested through Swagger's authorization mechanism.
+- **Improved Code Reliability:** Unit tests validate individual components and business logic.
+- **Integration Validation:** Integration tests verify interactions between application layers.
+- **Database Isolation:** H2 provides an independent testing environment without affecting production MySQL data.
+- **Regression Prevention:** Automated tests help detect unintended changes in existing functionality.
+- **Code Quality Visibility:** JaCoCo helps identify areas requiring additional test coverage.
+
+
+
 ## Useful Docker Commands
 
 Run these commands from the directory containing `docker-compose.yml`.
