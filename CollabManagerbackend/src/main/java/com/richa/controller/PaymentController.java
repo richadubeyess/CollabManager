@@ -5,6 +5,9 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.richa.exception.ProjectException;
 import com.richa.model.User;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +30,8 @@ import com.richa.service.UserService;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Payments", description = "Subscription payment APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
 
     @Value("${razorpay.api.key}")
@@ -43,7 +48,7 @@ public class PaymentController {
 
     @PostMapping("/payments/{planType}")
     public ResponseEntity<PaymentLinkResponse> createPaymentLink(@PathVariable String planType,
-                                                                 @RequestHeader("Authorization") String jwt)
+                                                                 @RequestHeader("Authorization") @Parameter(hidden = true) String jwt)
             throws RazorpayException, UserException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         int amount = 799 * 100;

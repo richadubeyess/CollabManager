@@ -3,6 +3,9 @@ package com.richa.controller;
 import java.util.List;
 
 import com.richa.response.AuthResponse;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,8 @@ import com.richa.service.UserService;
 
 @RestController
 @RequestMapping("/api/issues")
+@Tag(name = "Issues", description = "Issue and task management APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class IssueController {
 
     @Autowired
@@ -53,7 +58,7 @@ public class IssueController {
     }
 
     @PostMapping
-    public ResponseEntity<IssueDTO> createIssue(@RequestBody IssueRequest issue, @RequestHeader("Authorization") String token) throws UserException, IssueException, ProjectException {
+    public ResponseEntity<IssueDTO> createIssue(@RequestBody IssueRequest issue, @RequestHeader("Authorization") @Parameter(hidden = true) String token) throws UserException, IssueException, ProjectException {
         System.out.println("issue-----"+issue);
         User tokenUser = userService.findUserProfileByJwt(token);
         User user = userService.findUserById(tokenUser.getId());
@@ -81,7 +86,7 @@ public class IssueController {
 
     @PutMapping("/{issueId}")
     public ResponseEntity<Issue> updateIssue(@PathVariable Long issueId, @RequestBody IssueRequest updatedIssue,
-                                             @RequestHeader("Authorization") String token) throws IssueException, UserException, ProjectException {
+                                             @RequestHeader("Authorization") @Parameter(hidden = true) String token) throws IssueException, UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         System.out.println("user______>"+user);
         Issue updated = issueService.updateIssue(issueId,updatedIssue, user.getId()).get();
@@ -92,7 +97,7 @@ public class IssueController {
     }
 
     @DeleteMapping("/{issueId}")
-    public ResponseEntity<AuthResponse> deleteIssue(@PathVariable Long issueId, @RequestHeader("Authorization") String token) throws UserException, IssueException, ProjectException {
+    public ResponseEntity<AuthResponse> deleteIssue(@PathVariable Long issueId, @RequestHeader("Authorization") @Parameter(hidden = true) String token) throws UserException, IssueException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         String deleted = issueService.deleteIssue(issueId, user.getId());
 
