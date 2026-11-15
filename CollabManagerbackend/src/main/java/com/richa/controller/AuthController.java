@@ -5,6 +5,7 @@ package com.richa.controller;
 import com.richa.model.Subscription;
 import com.richa.repository.SubscriptionRepository;
 import com.richa.service.SubscriptionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import com.richa.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Signup and login APIs")
 public class AuthController {
 
     @Autowired

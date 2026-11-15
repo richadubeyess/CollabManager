@@ -1,5 +1,6 @@
 package com.richa.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import com.richa.service.UserService;
 
 @RestController
 @RequestMapping("/reset-password")
+@Tag(name = "Password Reset", description = "Password recovery and reset APIs")
 public class ResetPasswordController {
 
     @Autowired
